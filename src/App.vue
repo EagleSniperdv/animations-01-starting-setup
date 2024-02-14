@@ -12,6 +12,12 @@
     <p>This is a test dialog!</p>
     <button @click="hideDialog">Close it!</button>
   </base-modal>
+  <div class='container' >
+    <transition>
+        <p v-if="ParIsVisible">I am visible</p>
+    </transition>
+    <button @click="togglePar">toggle</button>
+  </div>
   <div class="container">
     <button @click="showDialog">Show Dialog</button>
   </div>
@@ -22,10 +28,14 @@ export default {
   data() {
     return { 
       animatedBlock: false,
-      dialogIsVisible: false 
+      dialogIsVisible: false ,
+      ParIsVisible: true,
     };
   },
   methods: {
+    togglePar() {
+      this.ParIsVisible = !this.ParIsVisible;
+    },
     transformBox() {
       this.animatedBlock = true;
     },
@@ -68,7 +78,8 @@ button:active {
   height: 8rem;
   background-color: #290033;
   margin-bottom: 2rem;
-  transition: transform 0.3s ease-out;
+
+  /* transition: transform 0.3s ease-out; */
 }
 .container {
   max-width: 40rem;
@@ -83,6 +94,50 @@ button:active {
 }
 
 .animate {
-  transform: translateX(-50px);
+  animation: slide-fade 0.3s ease-out forwards;
+  /* transform: translateX(-50px); */
+}
+
+.v-enter-from{
+  opacity: 0;
+  transform: translateX(-30px);
+
+}
+
+.v-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.v-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+
+}
+
+.v-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.v-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.v-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+@keyframes slide-fade {
+  0% {
+    transform: translateX(0) scale(1.1);
+  }
+
+  70% {
+    transform: translateX(-120px) scale(1.1);
+  }
+
+  100% {
+    transform: translateX(-150px) scale(1);
+  }
 }
 </style>
