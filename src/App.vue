@@ -1,38 +1,68 @@
 <template>
-  <div class="container">
-    <div 
-    class="block"
-    :class="{animate: animatedBlock}"
-    ></div>
-    <button 
-    @click="transformBox"
-    >Animate</button>
-  </div>
-  <base-modal @close="hideDialog" v-if="dialogIsVisible">
-    <p>This is a test dialog!</p>
-    <button @click="hideDialog">Close it!</button>
-  </base-modal>
-  <div class='container' >
-    <transition>
-        <p v-if="ParIsVisible">I am visible</p>
+  <router-view v-slot="slotProps">
+    <transition name="route" mode="out-in">
+      <component :is="slotProps.Component"></component>
     </transition>
-    <button @click="togglePar">toggle</button>
-  </div>
-  <div class="container">
-    <button @click="showDialog">Show Dialog</button>
-  </div>
+  </router-view>
 </template>  
 
 <script>
+
 export default {
+  components: {
+  
+  },
   data() {
     return { 
       animatedBlock: false,
       dialogIsVisible: false ,
       ParIsVisible: true,
+      enterInterval: null,
+      leaveInterval: null
+
     };
   },
   methods: {
+    enterCancelled() {
+      clearInterval(this.enterInterval);
+    },
+
+    leaveCancelled() {
+      clearInterval(this.leaveInterval);
+    },
+    beforeEnter(el) {
+      el.style.opacity = 0;
+    },
+    enter(el,done) {
+      let round = 1;
+      this.enterInterval = setInterval(() => {
+        el.style.opacity = round * 0.01;
+        round++;
+        if (round > 100)  {
+          clearInterval(this.enterInterval);
+          done();
+        }
+      },20);
+    },
+    beforeLeave(el) {
+      el.style.opacity = 1;
+    },
+    leave(el,done) {
+      let round = 10;
+      this.leaveInterval= setInterval(() => {
+        el.style.opacity = 1 - round * 0.01;
+        round++;
+        if(round > 100) {
+          clearInterval(this.leaveInterval);
+          done();
+        }
+      },20);
+    },
+
+    onAfterEnter() {
+
+    },
+
     togglePar() {
       this.ParIsVisible = !this.ParIsVisible;
     },
@@ -98,46 +128,32 @@ button:active {
   /* transform: translateX(-50px); */
 }
 
-.v-enter-from{
-  opacity: 0;
-  transform: translateX(-30px);
+.route-enter-from {
 
 }
 
-.v-enter-active {
-  transition: all 0.3s ease-out;
+.route-enter-active{
+  animation: slide-fade 0.4s ease-out;
 }
 
-.v-enter-to {
-  opacity: 1;
-  transform: translateY(0);
+.route-enter-to {
 
 }
 
-.v-leave-from {
-  opacity: 1;
-  transform: translateY(0);
+.route-leave-active {
+  animation: slide-fade 0.4s ease-out;
 }
 
-.v-leave-active {
-  transition: all 0.3s ease-out;
-}
 
-.v-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
 @keyframes slide-fade {
   0% {
     transform: translateX(0) scale(1.1);
   }
 
-  70% {
-    transform: translateX(-120px) scale(1.1);
-  }
+  
 
   100% {
-    transform: translateX(-150px) scale(1);
+    transform: translateX(-40px) scale(1);
   }
 }
 </style>
